@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.log
+.venv/
+venv/
+.env
+.env.*
+work/
+auth.json
+state_*.sqlite*
+*snapshot*.json
+*ready*.json
+*status*.json
+Thumbs.db
+.DS_Store

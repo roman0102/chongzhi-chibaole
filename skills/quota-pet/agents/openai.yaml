@@ -1,0 +1,4 @@
+interface:
+  display_name: "重置吃饱了"
+  short_description: "把 Codex 剩余额度变成会胖会瘦的小桌宠，支持真实额度和模拟试玩"
+  default_prompt: "用 $quota-pet 给我做一只随 Codex 剩余额度变胖变瘦的桌宠，额度用完就端着空碗等饭。"
