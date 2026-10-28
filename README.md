@@ -2,47 +2,47 @@
 
 给 Codex 养一只会被你饿瘦的桌宠。额度满时胖成球，用着用着就瘦了，额度恢复后再长回来。
 
-清野凛示例还能跟随本机 Codex 桌面聊天的工作状态走路、招手、开心和哭泣。平时只显示角色和一个小状态点，鼠标移上去才显示详情。
+**l2m_serinorin（l2m工作室吉祥物）** 示例还能跟随本机 Codex 桌面聊天的工作状态走路、招手、开心和哭泣。平时只显示角色和一个小状态点，鼠标移上去才显示详情。
 
 这是一个个人制作的 **Windows 实验版 Skill**，包含制作指引、运行脚本和角色素材。桌宠以独立悬浮窗运行。
 
-<img src="skills/quota-pet/assets/seinorin/seinorin-quota.png" width="720" alt="清野凛的不同额度体型示意">
+<img src="skills/quota-pet/assets/seinorin/seinorin-quota.png" width="720" alt="l2m_serinorin的不同额度体型示意">
 
 *上图是体型示意图。运行时另有走路和表情动画。*
 
 ## 安装和开始玩
 
-需要 Windows、已登录且正在运行的 Codex 桌面端，以及含 Tk 的 Python 3.10+。清野凛图片皮肤另需 Pillow。可以让 Codex 检查并协助准备环境。
+需要 Windows、已登录且正在运行的 Codex 桌面端，以及含 Tk 的 Python 3.10+。l2m_serinorin图片皮肤另需 Pillow。可以让 Codex 检查并协助准备环境。
 
 把本仓库链接交给 Codex，并告诉它：
 
 ```text
 请从这个仓库的 skills/quota-pet 目录安装「重置吃饱了」Skill：
 https://github.com/roman0102/chongzhi-chibaole
-安装完成后告诉我如何启动清野凛示例，并检查运行环境。
+安装完成后告诉我如何启动l2m_serinorin示例，并检查运行环境。
 ```
 
 安装后，在下一轮对话发送：
 
 ```text
-用 $quota-pet 启动清野凛，接入真实额度和本机 Codex 工作状态，最后创建带她头像的桌面快捷方式。
+用 $quota-pet 启动l2m_serinorin，接入真实额度和本机 Codex 工作状态，最后创建带她头像的桌面快捷方式。
 ```
 
 也可以下载仓库 ZIP，将 `skills/quota-pet` 整个目录放入自己的 Codex skills 目录，默认位置是 `~/.codex/skills/quota-pet`；如果设置了 `CODEX_HOME`，使用其中的 `skills` 目录。已经装过同名 Skill 时，让 Codex 检查已有版本后再更新。
 
-只想先看效果，可以说“用模拟额度试玩清野凛”。模拟额度不要求账号登录；工作状态连接会独立尝试读取本机桌面状态。
+只想先看效果，可以说“用模拟额度试玩l2m_serinorin”。模拟额度不要求账号登录；工作状态连接会独立尝试读取本机桌面状态。
 
-首次配置完成后，Skill 会在 Windows 桌面创建「清野凛 · 重置吃饱了」快捷方式，图标就是她的头像。以后关闭桌宠后，双击即可再次启动。换成自己的角色时，Skill 会同步更新快捷方式的启动皮肤和图标。临时试玩不创建桌面入口。
+首次配置完成后，Skill 会在 Windows 桌面创建「l2m_serinorin · 重置吃饱了」快捷方式，图标就是她的头像。以后关闭桌宠后，双击即可再次启动。换成自己的角色时，Skill 会同步更新快捷方式的启动皮肤和图标。临时试玩不创建桌面入口。
 
 ## 可以怎么玩
 
 - 额度决定胖瘦。默认每 5 分钟查询一次，也能在菜单里手动刷新。
-- 清野凛在工作时走动，等你回复或批准时招手，完成时开心，出错时哭一下。
+- l2m_serinorin在工作时走动，等你回复或批准时招手，完成时开心，出错时哭一下。
 - 空闲时自由溜达，拖动可以换位置，悬停会暂停移动并展开信息卡。
 - 点击角色打开菜单，试玩不同体型和表情，也能暂停溜达或退出。信息卡上的 × 和 Esc 同样可以退出。
 - 可以让 Codex 按 Skill 指引，换成你自己的角色或制作新的图片皮肤。
 
-没有图片皮肤时，默认小猪只依赖 Python 标准库。它有胖瘦、状态显示和漫游，但没有清野凛的整套招手、开心、哭泣动画。
+没有图片皮肤时，默认小猪只依赖 Python 标准库。它有胖瘦、状态显示和漫游，但没有l2m_serinorin的整套招手、开心、哭泣动画。
 
 ## 可选：让她提醒 Gmail 新邮件
 
@@ -50,7 +50,7 @@ https://github.com/roman0102/chongzhi-chibaole
 
 授权后，她会这样回应：
 
-| 情况 | 清野凛的反应 |
+| 情况 | l2m_serinorin的反应 |
 |---|---|
 | 首次连接成功 | 建立起点，旧邮件不会一下子全弹出来 |
 | 检测到新邮件 | 短暂招手，出现信封和待确认数量 |
@@ -59,11 +59,11 @@ https://github.com/roman0102/chongzhi-chibaole
 | 点击菜单里的“确认邮件提醒” | 清除本地提示；Gmail 邮件的已读状态保持原样 |
 | 连接失败或长时间没更新 | 明确显示异常或过期，不装作没有邮件 |
 
-工作需要你处理或出现错误时，原来的工作动作优先；邮件仍有信封提示。额度继续决定胖瘦。默认小猪能显示信封和提示卡，但没有清野凛的招手动作。
+工作需要你处理或出现错误时，原来的工作动作优先；邮件仍有信封提示。额度继续决定胖瘦。默认小猪能显示信封和提示卡，但没有l2m_serinorin的招手动作。
 
 下面是 **AI 绘制的功能示意图，非软件截图**。图中的邮件为虚构示例，不含真实邮件，不表示当前已经授权连接邮箱；实际界面以桌宠窗口为准。
 
-<img src="docs/gmail-feature-illustration.png" width="900" alt="Gmail功能示意，非软件截图：收到模拟邮件时清野凛招手并显示信封；确认本地提醒后恢复工作状态对应动作，不修改Gmail已读状态">
+<img src="docs/gmail-feature-illustration.png" width="900" alt="Gmail功能示意，非软件截图：收到模拟邮件时l2m_serinorin招手并显示信封；确认本地提醒后恢复工作状态对应动作，不修改Gmail已读状态">
 
 想启用时可以对 Codex 说：
 
@@ -99,7 +99,7 @@ python scripts/quota_pet.py --skin assets/seinorin/skin.json --demo 65 --gmail-d
 ```powershell
 python -m pip install Pillow
 python scripts/codex_quota.py --json
-python scripts/quota_pet.py --name 清野凛 --skin assets/seinorin/skin.json --background
+python scripts/quota_pet.py --name l2m_serinorin --skin assets/seinorin/skin.json --background
 python scripts/create_shortcut.py --skin assets/seinorin/skin.json --accent '#9270d6'
 ```
 
@@ -111,6 +111,6 @@ python scripts/create_shortcut.py --skin assets/seinorin/skin.json --accent '#92
 
 ## 项目与素材
 
-这是个人实验项目。仓库包含清野凛的原始动作素材和为不同体型生成的图片，生成提示词随素材保留。
+这是个人实验项目。仓库包含l2m_serinorin的原始动作素材和为不同体型生成的图片，生成提示词随素材保留。
 
 当前代码和角色素材尚未附许可文件，复用与再分发的许可范围待作者确认。暂不以 MIT 或自由商用项目宣传。

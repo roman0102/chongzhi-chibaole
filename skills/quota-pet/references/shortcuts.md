@@ -4,7 +4,7 @@
 
 ## 准备角色图标
 
-清野凛的 `assets/seinorin/skin.json` 已声明配套 `.ico`，可直接复用。自定义角色和默认小猪都应使用符合当前形象的图标：优先使用已有头像；需要创作头像时用可用的图像工具保持角色身份，生成透明方形头像，保存到角色素材目录。不要把整张精灵图当图标。清野凛的图标仅适用于清野凛。
+l2m_serinorin的 `assets/seinorin/skin.json` 已声明配套 `.ico`，可直接复用。自定义角色和默认小猪都应使用符合当前形象的图标：优先使用已有头像；需要创作头像时用可用的图像工具保持角色身份，生成透明方形头像，保存到角色素材目录。不要把整张精灵图当图标。l2m_serinorin的图标仅适用于l2m_serinorin。
 
 助手接受现成 `.ico`，也可将方形 PNG 封装为多个尺寸的 ICO；后者需要 Pillow。头像和 ICO 都保存到长期保留的 Skill 或角色项目目录，再写入快捷方式，避免引用生成缓存或临时目录。皮肤 JSON 可声明 `"icon": "角色图标.ico"`，与 JSON 同目录；无皮肤的代码角色同时显式指定名称和图标，例如 `python scripts/create_shortcut.py --name 饭桶 --icon assets/pig/pig-icon.ico`（先准备好该图标文件）。
 

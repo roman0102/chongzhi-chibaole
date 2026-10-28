@@ -330,8 +330,8 @@ def create_shortcut(options: argparse.Namespace) -> dict:
     launcher = _file(Path(__file__).with_name("quota_pet.py"), "Pet launcher")
     skin, skin_data = _skin(options.skin)
     name = options.name if options.name is not None else skin_data.get("name")
-    if not isinstance(name, str) or not name.strip() or len(name) > 12 or any(ord(c) < 32 for c in name):
-        raise ShortcutError("Provide --name or a skin name containing 1–12 characters.")
+    if not isinstance(name, str) or not name.strip() or len(name) > 32 or any(ord(c) < 32 for c in name):
+        raise ShortcutError("Provide --name or a skin name containing 1–32 characters.")
     name = name.strip()
     for option in ("accent", "color"):
         value = getattr(options, option)

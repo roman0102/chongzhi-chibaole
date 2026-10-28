@@ -1,4 +1,6 @@
-Use case: identity-preserve. Create ONE production animation sprite atlas for the existing Seinorin desktop companion. Image1 is the original character animation sheet: exact face identity, clothing, material, and animation style. Image2 is the approved quota body shapes: use the specified body shape below and keep that SAME FATNESS in EVERY frame.
+Character naming standardized for this release: l2m_serinorin (l2m工作室吉祥物). The character name in the saved prompt has been updated to the current public name.
+
+Use case: identity-preserve. Create ONE production animation sprite atlas for the existing l2m_serinorin desktop companion. Image1 is the original character animation sheet: exact face identity, clothing, material, and animation style. Image2 is the approved quota body shapes: use the specified body shape below and keep that SAME FATNESS in EVERY frame.
 CRITICAL LAYOUT: portrait canvas exactly 1024 by 1536 pixels, FOUR columns and SIX rows, exactly 24 isolated full-body sprites. Every equal cell is 256 by 256. No empty cells. No grid lines. Each character centered near x=128 within its cell, shoes on baseline y=238, top curl near y=22. Clear transparent padding, no overlap between cells. All frames same camera scale and body height, including head size; varying pose naturally but never different fatness between rows. Genuine alpha transparent background.
 The SIX rows from TOP to BOTTOM are:
 Row0 IDLE front view: four sequential subtle breathing/blinking frames: eyes open, half closed, closed, open.

@@ -1,5 +1,7 @@
+Character naming standardized for this release: l2m_serinorin (l2m工作室吉祥物). The character name in the saved prompt has been updated to the current public name.
+
 Use case: identity-preserve.
-Asset type: one transparent desktop-companion SPRITE ATLAS, exactly 3 columns by 2 rows of equal square cells, landscape 3:2 canvas. Input Image 1 is the existing Seinorin chibi animation sheet; use its FIRST front-facing idle pose as the sole character identity and rendering reference. This is an edit/adaptation of that character, not a new character.
+Asset type: one transparent desktop-companion SPRITE ATLAS, exactly 3 columns by 2 rows of equal square cells, landscape 3:2 canvas. Input Image 1 is the existing l2m_serinorin chibi animation sheet; use its FIRST front-facing idle pose as the sole character identity and rendering reference. This is an edit/adaptation of that character, not a new character.
 Create exactly SIX isolated full-body sprites, one centered in each cell. Read left-to-right then top-to-bottom:
 1 FULL quota: comically VERY CHUBBY, huge round cheeks, noticeably wide rounded belly and puffy sleeves under the same black-purple dress, smug satisfied smile, little hands resting on round belly.
 2 ROUND: moderately chubby, visibly smaller belly and cheeks than 1, cheerful smile.

@@ -805,8 +805,8 @@ def main():
             parser.error(str(exc))
         args.skin = str(skin.path)
     args.name = args.name if args.name is not None else (skin.name if skin else "饭桶")
-    if len(args.name) > 12:
-        parser.error("Keep the pet name within 12 characters")
+    if len(args.name) > 32:
+        parser.error("Keep the pet name within 32 characters")
     if args.snapshot:
         args.snapshot = str(Path(args.snapshot).resolve())
     if args.work_status_file:
