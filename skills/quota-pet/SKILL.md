@@ -12,7 +12,8 @@ description: 创建、运行或定制「重置吃饱了」额度桌宠，随 Cod
 1. 以本文件所在目录定位 `scripts/`，不要假定用户的安装路径。确认是本地桌面环境，找到含 `tkinter` 的 Python 3.10+。Codex 提供运行时定位工具时可用它寻找自带 Python；避免误用 Windows Store 的 Python 别名。需要安装依赖时说明实际缺项。
 2. 默认角色叫“饭桶”，用户没有指定形象时直接用它；名字和颜色用启动参数调整。先执行 `python scripts/codex_quota.py --json`，只读检查真实额度连接。用户只想试玩时直接用 `--demo 100`，不要求登录。
 3. 实际额度查询成功后运行 `python scripts/quota_pet.py --background`。使用解析到的 Python 绝对路径；含空格路径按当前 shell 正确引用。默认只显示角色，鼠标悬停才显示额度卡和 ×，移开后隐藏。点击打开菜单，可切换模拟造型、试玩表情、暂停“自由溜达”、刷新或退出；支持拖动和 Esc。不要重复启动已运行的同一只宠物。
-4. 完成时分别报告额度和工作状态的连接结果。通过实际窗口或 `--ready-file` 标记确认运行：pid 应与本次启动一致，visible 为 true；额度连接需 remaining_percent 有值且 error 为空；工作状态连接需 work_connected 为 true 且 work_state 不是 unknown。失败时保留未知，不能用试玩动作冒充任务状态。工作状态接入与排查见 [工作状态](references/work-status.md)。
+4. 分别验证额度和工作状态的连接结果。通过实际窗口或 `--ready-file` 标记确认运行：pid 应与本次启动一致，visible 为 true；额度连接需 remaining_percent 有值且 error 为空；工作状态连接需 work_connected 为 true 且 work_state 不是 unknown。失败时保留未知，不能用试玩动作冒充任务状态。工作状态接入与排查见 [工作状态](references/work-status.md)。
+5. Windows 上首次配置可长期使用的桌宠、制作或换角色完成后，按 [桌面快捷方式](references/shortcuts.md) 创建或更新桌面入口，并绑定当前角色的图标。已有正常入口时复用；更换角色时同步更新皮肤和图标。只读检查或临时试玩无需创建。收尾报告连接结果、快捷方式名称和实际位置；读回确认目标、参数和图标均正确后，才报告已完成。
 
 ## 制作与分享
 

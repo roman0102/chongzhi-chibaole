@@ -25,12 +25,14 @@ https://github.com/roman0102/chongzhi-chibaole
 安装后，在下一轮对话发送：
 
 ```text
-用 $quota-pet 启动清野凛，接入真实额度和本机 Codex 工作状态。
+用 $quota-pet 启动清野凛，接入真实额度和本机 Codex 工作状态，最后创建带她头像的桌面快捷方式。
 ```
 
 也可以下载仓库 ZIP，将 `skills/quota-pet` 整个目录放入自己的 Codex skills 目录，默认位置是 `~/.codex/skills/quota-pet`；如果设置了 `CODEX_HOME`，使用其中的 `skills` 目录。已经装过同名 Skill 时，让 Codex 检查已有版本后再更新。
 
 只想先看效果，可以说“用模拟额度试玩清野凛”。模拟额度不要求账号登录；工作状态连接会独立尝试读取本机桌面状态。
+
+首次配置完成后，Skill 会在 Windows 桌面创建「清野凛 · 重置吃饱了」快捷方式，图标就是她的头像。以后关闭桌宠后，双击即可再次启动。换成自己的角色时，Skill 会同步更新快捷方式的启动皮肤和图标。临时试玩不创建桌面入口。
 
 ## 可以怎么玩
 
@@ -60,11 +62,14 @@ https://github.com/roman0102/chongzhi-chibaole
 python -m pip install Pillow
 python scripts/codex_quota.py --json
 python scripts/quota_pet.py --name 清野凛 --skin assets/seinorin/skin.json --background
+python scripts/create_shortcut.py --skin assets/seinorin/skin.json --accent '#9270d6'
 ```
 
 默认小猪可以直接运行 `python scripts/quota_pet.py --background`，无需安装 Pillow。图片皮肤格式见 [皮肤说明](skills/quota-pet/references/skins.md)，完整制作流程见 [SKILL.md](skills/quota-pet/SKILL.md)。
 
-卸载时先通过菜单退出桌宠，再移除已安装的 `quota-pet` Skill 目录即可。
+快捷方式助手只创建或更新桌面入口，不会再启动一只宠物。自定义角色的图标配置与已有入口更新见 [快捷方式说明](skills/quota-pet/references/shortcuts.md)。
+
+卸载时先通过菜单退出桌宠，再移除对应桌面快捷方式和已安装的 `quota-pet` Skill 目录。移动安装目录后需重新创建快捷方式。
 
 ## 项目与素材
 
