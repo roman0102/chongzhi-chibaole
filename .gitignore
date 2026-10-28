@@ -11,5 +11,9 @@ state_*.sqlite*
 *snapshot*.json
 *ready*.json
 *status*.json
+collector.json
+ack.json
+gmail-state/
+gmail-private/
 Thumbs.db
 .DS_Store

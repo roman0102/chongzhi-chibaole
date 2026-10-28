@@ -363,6 +363,8 @@ def create_shortcut(options: argparse.Namespace) -> dict:
             arguments.extend(("--" + option, str(value)))
     if options.codex is not None:
         arguments.extend(("--codex", str(_file(options.codex, "Codex executable"))))
+    if options.gmail_status_file is not None:
+        arguments.extend(("--gmail-status-file", str(_file(options.gmail_status_file, "Gmail status file"))))
     if options.no_roam:
         arguments.append("--no-roam")
     scope = "thread" if options.work_thread else options.work_scope
@@ -405,6 +407,7 @@ def main() -> int:
     parser.add_argument("--interval", type=int, help="Quota refresh interval in seconds, minimum 30; omitted uses launcher default")
     parser.add_argument("--bucket", help="Explicit quota bucket ID; omitted uses launcher default")
     parser.add_argument("--codex", help="Explicit path to the installed Codex executable")
+    parser.add_argument("--gmail-status-file", help="Optional private Gmail status JSON from an explicitly enabled monitor")
     parser.add_argument("--work-scope", choices=("desktop", "thread"), default="desktop")
     parser.add_argument("--work-thread", help="Explicit chat ID; implies --work-scope thread")
     parser.add_argument("--python", help="Python interpreter for this skill; defaults to sys.executable's pythonw.exe")

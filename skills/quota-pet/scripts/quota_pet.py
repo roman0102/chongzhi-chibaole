@@ -161,7 +161,27 @@ class QuotaPet:
         from pet_art import draw_pet
 
         self.tk, self.root, self.args, self.draw_pet = tk, root, args, draw_pet
+        self.tkfont = tkfont
+        self.mail_fonts = {}
         self.skin = skin
+        self.gmail_demo = bool(getattr(args, "gmail_demo", False))
+        self.gmail_configured = self.gmail_demo or bool(getattr(args, "gmail_status_file", None))
+        self.HEIGHT = 464 if self.gmail_configured else 348
+        self.gmail_reader = None
+        self.gmail_status = {"enabled": False, "connected": False, "pending": False,
+                             "new_count": 0, "notice_id": None, "items": [],
+                             "mode": "demo" if self.gmail_demo else "live", "reason": "missing"}
+        self.next_gmail_poll = 0
+        self.gmail_acknowledged = False
+        self.gmail_ack_error = False
+        self.gmail_announced = set()
+        if self.gmail_configured and not self.gmail_demo:
+            from gmail_notice import MailNoticeReader
+            self.gmail_reader = MailNoticeReader(args.gmail_status_file)
+        elif self.gmail_demo:
+            self.gmail_status.update(enabled=True, pending=True, new_count=1,
+                notice_id="offline-mail-demo", reason=None,
+                items=[{"sender": "演示发件人", "subject": "这是一封模拟邮件，用来预览提醒效果", "received_at": None}])
         # Font sizes and Canvas geometry share a stable 96-DPI design space.
         root.tk.call("tk", "scaling", 96 / 72)
         self.events = queue.Queue()
@@ -247,6 +267,10 @@ class QuotaPet:
         for action, label in (("happy", "笑一笑"), ("cry", "哭一会儿"), ("wave", "招招手")):
             actions.add_command(label=label, command=lambda a=action: self.preview_action(a))
         self.menu.add_cascade(label="动作试玩", menu=actions)
+        if self.gmail_configured:
+            self.menu.add_command(label="确认邮件提醒（仅本地）", command=self.acknowledge_gmail,
+                                  state="disabled")
+            self.gmail_ack_menu = self.menu.index("end")
         self.menu.add_checkbutton(label="自由溜达", variable=self.roaming, command=self.toggle_roaming)
         self.menu.add_checkbutton(label="保持置顶", variable=self.topmost, command=lambda: root.attributes("-topmost", self.topmost.get()))
         self.menu.add_separator()
@@ -317,6 +341,9 @@ class QuotaPet:
         indicator = self.canvas.bbox("work-indicator")
         over = over or bool(indicator and indicator[0]-4 <= x <= indicator[2]+4 and
                             indicator[1]-4 <= y <= indicator[3]+4)
+        mail_badge = self.canvas.bbox("mail-indicator")
+        over = over or bool(mail_badge and mail_badge[0]-4 <= x <= mail_badge[2]+4 and
+                            mail_badge[1]-4 <= y <= mail_badge[3]+4)
         if self.hover and not over:
             over = any(box and box[0] <= x <= box[2] and box[1] <= y <= box[3]
                        for box in (self.canvas.bbox(item) for item in self.canvas.find_withtag("status")))
@@ -367,6 +394,68 @@ class QuotaPet:
             # Even an automatic source must keep supplying fresh heartbeats.
             self.set_work_status(self._work_snapshot)
 
+    def poll_gmail(self, now):
+        if not self.gmail_configured or now < self.next_gmail_poll:
+            return
+        self.next_gmail_poll = now + 1
+        if self.gmail_reader is not None:
+            try:
+                status = self.gmail_reader.poll()
+            except (OSError, ValueError):
+                status = dict(self.gmail_status, connected=False, reason="fetch_failed")
+            if status != self.gmail_status:
+                if status.get("pending") and status.get("notice_id") != self.gmail_status.get("notice_id"):
+                    self.gmail_acknowledged, self.gmail_ack_error = False, False
+                self.gmail_status = status
+                self.last_status = None
+        status = self.gmail_status
+        self.menu.entryconfigure(self.gmail_ack_menu, state="normal" if status.get("pending") else "disabled")
+        notice = status.get("notice_id")
+        eligible = (status.get("pending") and notice and (status.get("connected") or self.gmail_demo)
+                    and self.work_status["state"] not in ("waiting", "error") and now >= self.preview_until)
+        if eligible and notice not in self.gmail_announced:
+            try:
+                claimed = self.gmail_demo or self.gmail_reader.claim_notice(notice)
+            except (OSError, ValueError):
+                claimed = False
+            if claimed:
+                self.gmail_announced.add(notice)
+                self.behavior.notify_mail(notice, now)
+                self.last_status = None
+
+    def acknowledge_gmail(self):
+        if not self.gmail_status.get("pending"):
+            return
+        if self.gmail_demo:
+            success = True
+            self.gmail_status = dict(self.gmail_status, pending=False, new_count=0, items=[])
+        else:
+            try:
+                success = self.gmail_reader.ack(self.gmail_status.get("notice_id"))
+            except (OSError, ValueError):
+                success = False
+        self.gmail_ack_error = not success
+        if success:
+            self.gmail_acknowledged = True
+            self.behavior.clear_mail_gesture()
+        self.next_gmail_poll = 0
+        self.poll_gmail(time.monotonic())
+        self.last_status = None
+        self.draw_status()
+        self.write_status()
+
+    def gmail_state(self):
+        status = self.gmail_status
+        if self.gmail_demo:
+            return "demo"
+        if status.get("reason") == "unauthorized" or not status.get("enabled") and status.get("reason") == "disabled":
+            return "unauthorized"
+        if not status.get("connected"):
+            return "stale" if status.get("reason") == "stale" else "disconnected"
+        if status.get("pending"):
+            return "new"
+        return "confirmed" if self.gmail_acknowledged else "empty"
+
     def step_behavior(self, now):
         if now >= self.next_work_area:
             self.work_area = window_work_area(self.root)
@@ -380,7 +469,9 @@ class QuotaPet:
             move_window(self.root, *position)
         self.action, self.action_started = self.behavior.action, self.behavior.action_started
         marker = (self.hover, self.action, self.roaming.get(), position,
-                  self.work_status["state"], now < self.preview_until)
+                  self.work_status["state"], now < self.preview_until,
+                  self.gmail_state() if self.gmail_configured else None,
+                  self.gmail_status.get("new_count", 0), self.gmail_ack_error)
         if marker != self.last_motion_marker and now-self.marker_written >= 1:
             self.last_motion_marker = marker
             self.write_status()
@@ -459,6 +550,11 @@ class QuotaPet:
                       "work_counts": self.work_status["counts"],
                       "action_preview": time.monotonic() < self.preview_until,
                       "position": [self.root.winfo_x(), self.root.winfo_y()]}
+            if self.gmail_configured:
+                marker["gmail"] = {"state": self.gmail_state(), "connected": bool(self.gmail_status.get("connected")),
+                                   "pending": bool(self.gmail_status.get("pending")),
+                                   "count": self.gmail_status.get("new_count", 0),
+                                   "demo": self.gmail_demo, "ack_error": self.gmail_ack_error}
             # A bad optional marker path must not turn a walk into 12 writes/s.
             self.marker_written = time.monotonic()
             try:
@@ -472,6 +568,7 @@ class QuotaPet:
         now = time.monotonic()
         self.process_events()
         self.poll_work_status(now)
+        self.poll_gmail(now)
         if self.args.demo_cycle and self.mode == "demo" and now >= self.next_demo:
             self.demo_index = (self.demo_index + 1) % 5
             self.set_demo((100, 65, 35, 10, 0)[self.demo_index])
@@ -547,6 +644,75 @@ class QuotaPet:
             self.text(88,23,label,8)
         self.canvas.itemconfigure("status", state="normal" if self.hover else "hidden")
         self.draw_work_indicator()
+        self.draw_gmail()
+
+    def clipped_text(self, x, y, value, size=9, bold=False, color="#65564d", width=236):
+        text = " ".join(str(value or "").split())[:2048]
+        key = (size, bold)
+        if key not in self.mail_fonts:
+            self.mail_fonts[key] = self.tkfont.Font(root=self.root, family=self.font, size=size, weight="bold" if bold else "normal")
+        font = self.mail_fonts[key]
+        if font.measure(text) > width:
+            low, high = 0, len(text)
+            while low < high:
+                middle = (low+high+1)//2
+                if font.measure(text[:middle]+"…") <= width:
+                    low = middle
+                else:
+                    high = middle-1
+            text = text[:low]+"…"
+        return self.canvas.create_text(x,y,text=text,font=font,fill=color,anchor="w",tags=("status","mail-status"))
+
+    def draw_gmail(self):
+        self.canvas.delete("mail-indicator")
+        if not self.gmail_configured:
+            return
+        status, state = self.gmail_status, self.gmail_state()
+        pending = bool(status.get("pending"))
+        count = status.get("new_count", 0)
+        count_label = str(min(count, 99)) + ("+" if count > 99 else "")
+        fill = "#d9c9e8" if self.gmail_demo else ("#f4ce72" if pending else "#e8e9df")
+        outline = "#bf6658" if self.gmail_ack_error else "#685a4f"
+        self.canvas.create_rectangle(225,211,251,227,fill=fill,outline=outline,width=1,tags="mail-indicator")
+        self.canvas.create_line(225,211,238,220,251,211,fill=outline,width=1,tags="mail-indicator")
+        if pending:
+            self.canvas.create_oval(242,196,262,216,fill="#bf6658",outline="",tags="mail-indicator")
+            self.canvas.create_text(252,206,text=count_label,font=(self.font,7,"bold"),fill="#ffffff",tags="mail-indicator")
+        if self.gmail_demo:
+            self.canvas.create_text(236,185,text="邮件演示",font=(self.font,8),fill="#76518b",tags="mail-indicator")
+        self.round_rect(15,347,285,455,fill="#e3d9ca",outline="",tags=("status","mail-status"))
+        self.round_rect(12,344,282,452,fill="#fff9eb",outline="#42342e",width=2,tags=("status","mail-status"))
+        if self.gmail_demo:
+            title = f"邮件演示 · {count_label} 条待确认" if pending else "邮件演示 · 已确认本地提醒"
+        else:
+            title = {"new": f"Gmail · {count_label} 条待确认", "empty": "Gmail · 暂无新邮件",
+                     "confirmed": "Gmail · 已确认本地提醒", "unauthorized": "Gmail · 未授权或未启用",
+                     "stale": "Gmail · 检查结果已过期", "disconnected": "Gmail · 暂未连接"}[state]
+        self.clipped_text(28,365,title,10,True,"#42342e")
+        items = status.get("items") or []
+        if pending and items:
+            item = items[0]
+            self.clipped_text(28,389,"来自 " + str(item.get("sender") or "未知发件人"),9)
+            self.clipped_text(28,410,item.get("subject") or "（无主题）",10,color="#42342e")
+        else:
+            lines = {"demo": ("这是离线演示，没有连接邮箱", "仅清除了这次模拟提醒"),
+                     "empty": ("已连接，当前没有新邮件提醒", ""),
+                     "confirmed": ("只确认了本地提醒", "Gmail 邮件状态没有改变"),
+                     "unauthorized": ("尚未启用已授权的邮件检查", "确认连接后才会显示真实邮件"),
+                     "stale": ("正在等待新的邮件检查结果", "失联不会清除已有提醒"),
+                     "disconnected": ("尚未收到可用的邮件检查结果", "连接恢复后会继续检查")}
+            first, second = lines.get(state, ("新邮件提醒", ""))
+            self.clipped_text(28,389,first)
+            self.clipped_text(28,410,second)
+        footer = "菜单确认仅清本地提醒，不标为已读"
+        if self.gmail_ack_error:
+            footer = "本地确认失败 · 提醒仍保留，请重试"
+        elif self.gmail_demo:
+            footer = "模拟数据 · 不读取或修改真实 Gmail"
+        elif pending and not status.get("connected"):
+            footer = f"连接不可用 · 保留 {count_label} 条待确认提醒"
+        self.clipped_text(28,436,footer,8,color="#9b5b4d" if self.gmail_ack_error else "#65564d")
+        self.canvas.itemconfigure("mail-status",state="normal" if self.hover else "hidden")
 
     def work_label(self):
         if time.monotonic() < self.preview_until:
@@ -611,6 +777,9 @@ def main():
     parser.add_argument("--work-status-file", help="Optional local work-status heartbeat JSON; expires after 30 seconds")
     parser.add_argument("--work-scope", choices=("desktop", "thread"), default="desktop", help="Observe active local desktop chats, or one chat")
     parser.add_argument("--work-thread", help="Observe this chat ID; implies --work-scope thread")
+    mail = parser.add_mutually_exclusive_group()
+    mail.add_argument("--gmail-status-file", help="Optional local Gmail notice JSON from an authorized external check")
+    mail.add_argument("--gmail-demo", action="store_true", help="Offline simulated mail notice; never connects to Gmail")
     parser.add_argument("--background", action="store_true", help="Launch detached; no console window on Windows")
     parser.add_argument("--ready-file", help="Optional local readiness marker for testing")
     parser.add_argument("--quit-after", type=float, help="Close after N seconds; for smoke testing")
@@ -642,6 +811,8 @@ def main():
         args.snapshot = str(Path(args.snapshot).resolve())
     if args.work_status_file:
         args.work_status_file = str(Path(args.work_status_file).resolve())
+    if args.gmail_status_file:
+        args.gmail_status_file = str(Path(args.gmail_status_file).resolve())
     if args.ready_file:
         args.ready_file = str(Path(args.ready_file).resolve())
     if args.codex and Path(args.codex).is_file():
@@ -663,6 +834,7 @@ def main():
                               ("--skin", args.skin),
                               ("--work-status-file", args.work_status_file),
                               ("--work-thread", args.work_thread),
+                              ("--gmail-status-file", args.gmail_status_file),
                               ("--ready-file", args.ready_file), ("--demo", args.demo),
                               ("--quit-after", args.quit_after)):
             if value is not None:
@@ -671,6 +843,8 @@ def main():
             command.append("--demo-cycle")
         if args.no_roam:
             command.append("--no-roam")
+        if args.gmail_demo:
+            command.append("--gmail-demo")
         kwargs = {"stdin": subprocess.DEVNULL, "stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL, "cwd": str(Path(__file__).parent)}
         if sys.platform == "win32":
             kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS

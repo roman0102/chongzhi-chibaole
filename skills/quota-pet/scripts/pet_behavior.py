@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import math
 import random
+from collections import deque
 
 
 def clamp_position(x, y, work_area, size):
@@ -49,6 +50,20 @@ class PetBehavior:
         self.last_event_key = None
         self.preview_until = 0
         self.preview_action = None
+        self.mail_wave_until = 0
+        self.mail_notices = deque(maxlen=128)
+
+    def notify_mail(self, notice_id, now):
+        """A local notification gesture; never changes the real work state."""
+        if not notice_id or notice_id in self.mail_notices:
+            return False
+        self.mail_notices.append(notice_id)
+        self.mail_wave_until = now + 4
+        self.target = None
+        return True
+
+    def clear_mail_gesture(self):
+        self.mail_wave_until = 0
 
     def _action(self, name, now, duration=0):
         if name != self.action:
@@ -95,7 +110,8 @@ class PetBehavior:
             self.position = tuple(map(float, position))
         x, y = clamp_position(*self.position, work_area, size)
         previewing = now < self.preview_until
-        can_walk = (not paused and roaming and not previewing
+        mailing = now < self.mail_wave_until and self.work_state not in ("waiting", "error")
+        can_walk = (not paused and roaming and not previewing and not mailing
                     and self.work_state in ("idle", "working"))
         if not can_walk:
             self.stop_walk(now)
@@ -123,10 +139,14 @@ class PetBehavior:
                 x, y = x + (tx-x)*step/distance, y + (ty-y)*step/distance
         if previewing:
             action = self.preview_action
-        elif self.work_state == "working":
-            action = self.direction
         elif self.work_state == "waiting":
             action = "wave"
+        elif self.work_state == "error":
+            action = "cry" if now < self.work_event_until else "idle"
+        elif mailing:
+            action = "wave"
+        elif self.work_state == "working":
+            action = self.direction
         elif self.work_state in ("completed", "error") and now < self.work_event_until:
             action = "happy" if self.work_state == "completed" else "cry"
         else:
