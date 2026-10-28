@@ -16,6 +16,7 @@ import time
 
 from codex_quota import read_quota
 from pet_behavior import HoverState, PetBehavior, clamp_position
+from skin_events import SkinEvents
 
 
 def prepare_dpi():
@@ -164,6 +165,7 @@ class QuotaPet:
         self.tkfont = tkfont
         self.mail_fonts = {}
         self.skin = skin
+        self.presentation = skin.presentation if skin else SkinEvents()
         self.gmail_demo = bool(getattr(args, "gmail_demo", False))
         self.gmail_configured = self.gmail_demo or bool(getattr(args, "gmail_status_file", None))
         self.HEIGHT = 464 if self.gmail_configured else 348
@@ -260,11 +262,15 @@ class QuotaPet:
         self.menu = tk.Menu(root, tearoff=False)
         self.menu.add_command(label="重新读取额度快照" if args.snapshot else "刷新真实额度", command=self.return_live)
         demo = tk.Menu(self.menu, tearoff=False)
-        for pct, label in ((100, "100% · 胖成球"), (65, "65% · 圆润"), (35, "35% · 正常"), (10, "10% · 饿了"), (0, "0% · 皮包骨")):
+        demo_choices = ((100, "100% · 胖成球"), (65, "65% · 圆润"), (35, "35% · 正常"), (10, "10% · 饿了"), (0, "0% · 皮包骨"))
+        if self.presentation.actions:
+            demo_choices = ((100, "100% · 亲吻金杯"), (90, "90% · 捂耳庆祝"), (50, "50% · 待机"), (10, "10% · 待机"), (0, "0% · 没额度了"))
+        for pct, label in demo_choices:
             demo.add_command(label=label, command=lambda p=pct: self.set_demo(p))
         self.menu.add_cascade(label="试玩造型（模拟数据）", menu=demo)
         actions = tk.Menu(self.menu, tearoff=False)
-        for action, label in (("happy", "笑一笑"), ("cry", "哭一会儿"), ("wave", "招招手")):
+        action_choices = tuple(self.presentation.labels.items()) or (("happy", "笑一笑"), ("cry", "哭一会儿"), ("wave", "招招手"))
+        for action, label in action_choices:
             actions.add_command(label=label, command=lambda a=action: self.preview_action(a))
         self.menu.add_cascade(label="动作试玩", menu=actions)
         if self.gmail_configured:
@@ -279,7 +285,8 @@ class QuotaPet:
         root.update_idletasks()
         self.work_area = window_work_area(root)
         self.next_work_area = self.started + 2
-        move_window(root, *clamp_position(root.winfo_x(), root.winfo_y(),
+        start_position = getattr(args, "position", None) or (root.winfo_x(), root.winfo_y())
+        move_window(root, *clamp_position(*start_position,
                                          self.work_area, (self.WIDTH, self.HEIGHT)))
         self.draw_status()
         self.animate()
@@ -461,13 +468,20 @@ class QuotaPet:
             self.work_area = window_work_area(self.root)
             self.next_work_area = now + 2
         current = (self.root.winfo_x(), self.root.winfo_y())
+        quota_preview = self.mode == "demo" and bool(self.presentation.actions)
         position = self.behavior.tick(now, current, self.work_area, (self.WIDTH, self.HEIGHT),
                                      self.remaining, paused=self.hover or self.drag is not None or
                                      self.menu_open or now < self.pause_until,
-                                     roaming=self.roaming.get(), feeding=now < self.feed_until)
+                                     roaming=self.roaming.get() and not quota_preview and not (self.remaining == 0 and "empty" in self.presentation.actions), feeding=now < self.feed_until)
         if position != current and self.drag is None:
             move_window(self.root, *position)
-        self.action, self.action_started = self.behavior.action, self.behavior.action_started
+        selected = self.presentation.select(self.behavior.action, self.remaining,
+            self.work_status["state"], mailing=now < self.behavior.mail_wave_until,
+            previewing=now < self.behavior.preview_until, quota_preview=quota_preview)
+        if selected != self.action:
+            self.action, self.action_started = selected, now
+        elif selected == self.behavior.action:
+            self.action_started = self.behavior.action_started
         marker = (self.hover, self.action, self.roaming.get(), position,
                   self.work_status["state"], now < self.preview_until,
                   self.gmail_state() if self.gmail_configured else None,
@@ -481,6 +495,11 @@ class QuotaPet:
         self.mode = "demo"
         self.remaining = percent
         self.status_error = None
+        if self.presentation.actions:
+            self.behavior.preview_until = self.preview_until = 0
+            self.behavior.stop_walk(time.monotonic())
+            self.action = self.presentation.quota_action(percent)
+            self.action_started = time.monotonic()
         if old is not None and percent > old:
             self.feed_until = time.monotonic() + 3
         self.last_status = None
@@ -571,7 +590,8 @@ class QuotaPet:
         self.poll_gmail(now)
         if self.args.demo_cycle and self.mode == "demo" and now >= self.next_demo:
             self.demo_index = (self.demo_index + 1) % 5
-            self.set_demo((100, 65, 35, 10, 0)[self.demo_index])
+            values = (100, 90, 50, 10, 0) if self.presentation.actions else (100, 65, 35, 10, 0)
+            self.set_demo(values[self.demo_index])
             self.next_demo = now + 3
         if self.mode != "demo" and not self.busy and now >= self.next_fetch:
             self.fetch()
@@ -593,7 +613,20 @@ class QuotaPet:
         if status_key != self.last_status:
             self.draw_status()
             self.last_status = status_key
+        self.draw_action_bubble()
         self.root.after(80, self.animate)
+
+    def draw_action_bubble(self):
+        self.canvas.delete("action-bubble")
+        message = self.presentation.bubbles.get(self.action)
+        if not message:
+            return
+        self.round_rect(20, 7, 260, 43, 12, fill="#fff9eb", outline="#42342e",
+                        width=2, tags="action-bubble")
+        self.canvas.create_polygon(139, 42, 150, 51, 160, 42, fill="#fff9eb",
+                                   outline="", tags="action-bubble")
+        self.canvas.create_text(140, 25, text=message, font=(self.font, 12, "bold"),
+                                fill="#42342e", tags="action-bubble")
 
     def round_rect(self, x1, y1, x2, y2, radius=18, **kwargs):
         points = (x1+radius,y1,x2-radius,y1,x2,y1,x2,y1+radius,x2,y2-radius,x2,y2,x2-radius,y2,x1+radius,y2,x1,y2,x1,y2-radius,x1,y1+radius,x1,y1)
@@ -716,7 +749,7 @@ class QuotaPet:
 
     def work_label(self):
         if time.monotonic() < self.preview_until:
-            name = {"happy": "笑一笑", "cry": "哭一会儿", "wave": "招招手"}.get(self.behavior.preview_action, "动作")
+            name = {"happy": "笑一笑", "cry": "哭一会儿", "wave": "招招手", **self.presentation.labels}.get(self.behavior.preview_action, "动作")
             return f"动作试玩 · {name}"
         state = self.work_status["state"]
         if state == "waiting":
@@ -773,6 +806,7 @@ def main():
     parser.add_argument("--demo", type=percent, help="Clearly labeled offline preview, 0–100")
     parser.add_argument("--demo-cycle", action="store_true", help="Cycle all five demo shapes")
     parser.add_argument("--no-roam", action="store_true", help="Keep the pet in one place; gestures still work")
+    parser.add_argument("--position", nargs=2, type=int, metavar=("X", "Y"), help="Initial desktop coordinates, clamped to the work area")
     parser.add_argument("--snapshot", help="Read a sanitized quota snapshot JSON instead of the live account")
     parser.add_argument("--work-status-file", help="Optional local work-status heartbeat JSON; expires after 30 seconds")
     parser.add_argument("--work-scope", choices=("desktop", "thread"), default="desktop", help="Observe active local desktop chats, or one chat")
@@ -843,6 +877,8 @@ def main():
             command.append("--demo-cycle")
         if args.no_roam:
             command.append("--no-roam")
+        if args.position is not None:
+            command.extend(("--position", str(args.position[0]), str(args.position[1])))
         if args.gmail_demo:
             command.append("--gmail-demo")
         kwargs = {"stdin": subprocess.DEVNULL, "stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL, "cwd": str(Path(__file__).parent)}

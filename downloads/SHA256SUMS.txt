@@ -1,0 +1,2 @@
+30cd1a8c33e6577c912a5c706c553c6c43160294eac35704f5b0ed9f0595d0dc  messi-codex-skill-windows-v1.0.0.zip
+a229bfc051cde0dd175062e604c584d9f7f797abae1597a3d3dee9724d1cbbd2  messi-offline-windows-v1.0.0.zip

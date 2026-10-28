@@ -1,0 +1,27 @@
+Generated with the built-in image_gen tool, 2026-10-29.
+Reference: user-provided Argentina number 10 plush toy photograph.
+The original photograph and original real-person GIF references are kept outside this asset package.
+
+SHEET 1
+Edit/animate the USER-SUPPLIED EXISTING plush toy shown in the reference photograph into a desktop pet sprite sheet. This is the user's chosen Messi-themed Argentina number 10 plush toy; preserve this exact toy design rather than inventing a realistic human.
+Preserve its huge round brown furry hair and beard, beige round nose and ears, black embroidered bead eyes with white highlights, compact plush body, tiny rounded arms/legs, Argentina pale-blue/white striped number 10 jersey and BLACK shorts. Retain a soft tactile plush look, with clear silhouette and small-scale readability. Every frame wears the same kit.
+Output one genuinely transparent RGBA sheet, exactly FOUR columns x FOUR rows, sixteen complete separated toy figures, no background, no product marketing text, no flags, no labels or speech bubbles. Portrait canvas ideally 1024x1536, equal 256x384 cells, large transparent padding between figures. Same toy size and feet baseline in every cell, whole head/feet/props inside each cell. No extra limbs.
+Four sequential frames per row:
+Row 1 (idle): standing, subtle breathing, blink then eyes open, arms relaxed.
+Row 2 (high quota celebration): lift both tiny hands beside ears, cup hands behind ears with elbows out, small proud head tilt, hold celebration. Hands clearly visible beside ears.
+Row 3 (full quota): hold one golden football World Cup trophy in both hands at chest, bring face close, kiss the trophy with closed eyes, gently pull back. Keep the plush beard and two arms intact.
+Row 4 (empty quota reaction): blank stare, eyebrows raise and lips purse, pout with slight head tilt, turn head and open mouth in an exasperated reaction. No tears, no skeleton, no text.
+This is an adaptation of the uploaded toy photograph. Remove photographic setting and marketing elements. Do not add any humans or other characters.
+
+SHEET 2
+Edit the existing user-supplied Messi-themed Argentina number 10 plush toy into the SECOND production animation sheet for the same desktop pet.
+Image 1 is the ORIGINAL TOY identity reference. Image 2 is the already made sprite sheet: match its toy design, soft fur materials, large round brown head/beard, beige nose/ears, embroidered black eyes, proportions, front lighting and SAME pale-blue/white Argentina number 10 shirt with BLACK shorts. Preserve that exact toy, not a realistic human.
+Create exactly 16 separate complete plush figures in FOUR columns and FOUR rows, equal grid spacing, portrait 1024x1536 transparent RGBA canvas. Each figure about 290px tall within a 256x384 cell; large transparent gutters, full heads and feet and props not clipped. No labels, no marketing text, no speech text, no grid or floor/background. Two arms, two legs each.
+Row 1, four left-to-right MAIL frames: grasp a large ivory rectangular envelope with BOTH hands at its top corners, lift it outward at chest level like proudly displaying a football jersey, hold and gently tilt. Envelope has a clear triangular flap and small red mail seal but NO written text. Toy still fully dressed. Both hands remain visibly gripping edges.
+Row 2, four TALKING frames: toy looks sideways with slightly annoyed eyebrows, raises one hand, gestures outward as if saying 'go over there', then lowers it while mouth talks. One arm gestures, the other hangs at side. Bubble will be drawn by software; do NOT put text/bubble in image.
+Row 3, four RUN-RIGHT frames: full body three-quarter facing RIGHT, alternating short legs and opposite arm swings, a single black-white football close to feet, dribbling it forward. Same large soft head. Four distinct sequential running poses.
+Row 4, four RUN-LEFT frames: full body three-quarter facing LEFT, alternating legs and opposite arm swings, dribble a single black-white football near feet. Number 10 must remain correctly drawn, not mirrored.
+Only these 16 toys. Consistent face/head size across all poses. Actual alpha transparency, no opaque background.
+
+ICON
+Create a square desktop shortcut icon from the user-supplied Argentina number 10 Messi-themed plush toy. Preserve the exact existing toy identity: huge round brown furry hair and beard, beige round nose, embroidered black eyes, small friendly mouth, Argentina sky-blue and white striped number 10 shirt. Show just its head and upper torso, centered, filling 85% of the square, facing forward. Actual clean alpha transparency outside the plush silhouette. No product photo background, no flags, no marketing text, no icon tile or frame, no glow, no colored specks or fringes, no shadows outside the silhouette. This is a clean cutout icon of the uploaded existing toy, not a realistic human.

@@ -7,6 +7,10 @@ description: 创建、运行或定制「重置吃饱了」额度桌宠，随 Cod
 
 额度决定胖瘦，真实任务状态决定动作。随附 Python/Tk 实现，以及 l2m_serinorin（l2m工作室吉祥物）的额度形态、走路和表情动画。默认小猪只用标准库；图片皮肤另需 Pillow。桌宠绘制、额度和工作状态连接不调用模型、不需要 API key。可选 Gmail 提醒由 Codex 授权连接和定时任务供给，会使用 Codex 额度，默认关闭。
 
+## 梅西桌宠的两个下载版本
+
+用户要下载或了解梅西桌宠时，使用[梅西下载与五语指南](https://github.com/roman0102/chongzhi-chibaole/blob/main/docs/messi/README.md)。Codex 联动版使用本 Skill 和 `assets/messi/skin.json`；独立循环版是另一个不连接 Codex 的 Windows EXE。不要把离线轮播当作真实额度或邮件状态。五语文档仅覆盖梅西桌宠，不代表程序菜单已本地化。
+
 ## 开始玩
 
 1. 以本文件所在目录定位 `scripts/`，不要假定用户的安装路径。确认是本地桌面环境，找到含 `tkinter` 的 Python 3.10+。Codex 提供运行时定位工具时可用它寻找自带 Python；避免误用 Windows Store 的 Python 别名。需要安装依赖时说明实际缺项。
@@ -30,6 +34,8 @@ description: 创建、运行或定制「重置吃饱了」额度桌宠，随 Cod
 制作阶段需要可用的图像生成工具，按该工具的图像工作流处理；工具不可用时如实说明，可运行已有角色或接入用户已备好的精灵图，不把普通静态照片直接称作完整动画。生成结果可能需要迭代，不能保证逐像素还原。用户图片及衍生素材留在其本机项目；发布到公共仓库仅在用户另外要求分享这些素材时执行。
 
 ### l2m_serinorin与其他图片角色
+
+用户指定按额度播放特殊动作时，可以用动作代替胖瘦，保留六个额度状态键用于兼容。当前本地公仔示例是 `assets/messi/skin.json`：100% 亲吻金杯，80% 至不足 100% 捂耳庆祝，0% 播放没额度表情；等待回复或批准时挥手说话并同步显示西语气泡，新邮件时举信封，工作与漫游时带球。此示例存在时可直接通过 `--skin` 启动；仅包含其他素材的分享包不应假定附带公仔。自定义动作、优先级及气泡配置见 [皮肤格式](references/skins.md#事件动作与气泡)。
 
 `assets/seinorin/skin.json` 是可直接运行的示例：`python scripts/quota_pet.py --name l2m_serinorin --skin assets/seinorin/skin.json --background`。路径相对于启动目录；实际调用时解析为绝对路径。图片模式先确认当前 Python 可导入 `PIL`；缺少时用该 Python 安装 Pillow。默认小猪不需要此依赖。
 

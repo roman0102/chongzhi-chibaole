@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import math
 from pathlib import Path
+from skin_events import EXTRA_ACTIONS, SkinEvents
 
 
 STATES = ("full", "round", "normal", "hungry", "empty", "unknown")
@@ -21,12 +22,14 @@ class AnimationClip:
         self.frames = tuple(frames)
         self.ms = milliseconds
         self.row = row
+        self.loop = True
 
     def frame_index(self, seconds):
         if (isinstance(seconds, bool) or not isinstance(seconds, (int, float))
                 or not math.isfinite(seconds)):
             raise SkinError("Animation time must be a finite number of seconds.")
-        return math.floor(max(0, seconds) * 1000 / self.ms) % len(self.frames)
+        index = math.floor(max(0, seconds) * 1000 / self.ms)
+        return index % len(self.frames) if self.loop else min(index, len(self.frames)-1)
 
 
 class AnimationSheet:
@@ -57,6 +60,7 @@ class SpriteSkin:
         self._photos = []
         self.animations = animations or {}
         self._clip_photos = {}
+        self.presentation = SkinEvents()
 
     def frame_at(self, state, phase=0, action="idle", action_phase=None):
         """Return the prepared PIL frame without requiring a display."""
@@ -217,10 +221,10 @@ def _animation_config(path, config):
     clips = config.get("clips")
     if not isinstance(clips, dict) or "idle" not in clips:
         raise SkinError("Animation 'clips' must include an idle clip.")
-    if any(key not in ACTIONS for key in clips):
-        raise SkinError("Animation clip names must be idle, walk-right, walk-left, happy, cry or wave.")
+    if any(key not in ACTIONS + EXTRA_ACTIONS for key in clips):
+        raise SkinError("Unknown animation clip name.")
     normalized = []
-    for action in ACTIONS:
+    for action in ACTIONS + EXTRA_ACTIONS:
         if action not in clips:
             continue
         clip = clips[action]
@@ -362,6 +366,8 @@ def load_skin(manifest_path):
     has_static = any(key in manifest for key in ("image", "columns", "rows", "states"))
     skin = _load_static(path, name, manifest) if has_static or "animations" not in manifest else None
     if "animations" not in manifest:
+        if manifest.get("presentation"):
+            raise SkinError("Skin presentation requires animation clips.")
         return skin
     definitions = manifest["animations"]
     if not isinstance(definitions, dict) or any(state not in STATES for state in definitions):
@@ -398,4 +404,23 @@ def load_skin(manifest_path):
         skin = SpriteSkin(path, name.strip(), [frame], {state: 0 for state in STATES},
                           representative.crop_box, representative.cell_size)
     skin.animations = animations
+    try:
+        skin.presentation = SkinEvents(manifest.get("presentation"))
+        skin.presentation.validate_clips(animations, STATES)
+    except ValueError as exc:
+        raise SkinError(str(exc)) from exc
+    for animation in set(animations.values()):
+        for action in skin.presentation.hold:
+            animation.clips[action].loop = False
+    # Leave headroom for a speech bubble; older skins keep their original size.
+    if skin.presentation.bubbles:
+        from PIL import Image
+        for animation in set(animations.values()):
+            for clip in animation.clips.values():
+                scale = min(1, 170 / max(frame.height for frame in clip.frames))
+                clip.frames = tuple(frame.resize((max(1, round(frame.width * scale)),
+                                                   max(1, round(frame.height * scale))),
+                                                  Image.Resampling.LANCZOS)
+                                    for frame in clip.frames)
+            animation.display_size = animation.clips["idle"].frames[0].size
     return skin

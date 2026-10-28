@@ -1,0 +1,10 @@
+Edit the existing Argentina number 10 plush desktop pet into a REPLACEMENT MAIL animation strip.
+Reference 1: its previous sprite sheet; use ONLY the FIRST ROW's envelope-holding action and toy materials/identity. Reference 2: use the serious unblinking face, upright stance, and plush hand styling shown there.
+User requirements: while displaying the envelope like displaying a jersey, the toy must be SERIOUS, BOTH EYES ALWAYS OPEN, NO blinking, no winking, no smile. Enlarge the envelope substantially: about 1.4 times the previous width and 1.5 times its height. It should be a prominent wide ivory envelope, almost as wide as the toy's head, held out toward the viewer by BOTH hands gripping its upper corners. Keep a clear triangular flap and red circular wax seal, no words. It may cover most of the jersey/torso but never the face, beard or feet.
+Preserve this exact existing plush toy: large rounded brown furry head and beard, beige round nose/ears, embroidered round black eyes with fixed white glints, serious angled eyebrows, closed neutral mouth, Argentina sky blue and white striped number 10 shirt and BLACK shorts, soft plush material. Not a realistic human.
+Output FOUR separate complete figures, FOUR columns and ONE row on a wide transparent RGBA canvas, ideally 2048x1024. Same head/body size in every frame, same feet baseline, large transparent gutters so the extended envelope and hands do not cross cell boundaries. No text, speech bubbles, backgrounds, shadows or labels.
+Frame 1: serious eyes open, large envelope held at lower chest height with both hands on upper corners.
+Frame 2: raise the same envelope slightly to chest height, show it forward; same face and open eyes.
+Frame 3: envelope held squarely forward just below beard, both hands at upper corners, torso straight, eyes open, serious.
+Frame 4: HOLD the same proud serious envelope display, same eyes, same neutral mouth, no head tilt.
+Exactly two hands and two arms, one envelope in each frame. All head/feet/hands/envelope edges fully within the transparent canvas.

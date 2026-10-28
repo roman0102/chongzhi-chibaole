@@ -4,6 +4,7 @@ from __future__ import annotations
 import math
 import random
 from collections import deque
+from skin_events import EXTRA_ACTIONS
 
 
 def clamp_position(x, y, work_area, size):
@@ -71,8 +72,8 @@ class PetBehavior:
         self.action_until = now + duration
 
     def play(self, action, now, duration=3.2):
-        if action not in ("happy", "cry", "wave"):
-            raise ValueError("Only happy, cry and wave can be previewed")
+        if action not in ("happy", "cry", "wave") + EXTRA_ACTIONS:
+            raise ValueError("Unknown preview gesture")
         self.target = None
         self.preview_action, self.preview_until = action, now+duration
         self.action_started = now

@@ -10,6 +10,21 @@
 
 *上图是体型示意图。运行时另有走路和表情动画。*
 
+## 梅西桌面宝宝 · Messi Desktop Pet
+
+**两个版本，分别下载：**
+
+| 版本 / Edition | 下载 / Download | 适合谁 |
+| --- | --- | --- |
+| Codex 联动版 / Codex-connected | [下载梅西 Skill ZIP](https://github.com/roman0102/chongzhi-chibaole/raw/refs/heads/main/downloads/messi-codex-skill-windows-v1.0.0.zip) | 想让动作跟随真实额度和工作状态；需要 Windows、Codex、Python/Tk/Pillow |
+| 独立循环版 / Standalone loop | [下载梅西离线 EXE ZIP](https://github.com/roman0102/chongzhi-chibaole/raw/refs/heads/main/downloads/messi-offline-windows-v1.0.0.zip) | 解压双击即可；无需 Codex、Python 安装、账号或联网，适用于 Windows 64 位 |
+
+**梅西专用五语说明、动作注释与使用指南：** [中文](docs/messi/zh-CN.md) · [English](docs/messi/en.md) · [Español](docs/messi/es.md) · [日本語](docs/messi/ja.md) · [한국어](docs/messi/ko.md)
+
+<img src="docs/messi/previews/trophy.gif" width="126" alt="Messi trophy kiss / 梅西亲吻金杯"><img src="docs/messi/previews/ears.gif" width="126" alt="Serious hands-to-ears celebration / 严肃捂耳庆祝"><img src="docs/messi/previews/mail.gif" width="126" alt="Holding a large envelope / 展示大信封">
+
+上图由实际动画帧导出。独立版每 6 秒轮播动作，信封和气泡不代表真实邮件；联动版的 Gmail 默认关闭，单独授权后的定时检查会使用 Codex 额度。五语指南仅针对梅西桌宠，程序菜单目前仍为中文。[查看完整下载页与文件校验](docs/messi/README.md)。
+
 ## 安装和开始玩
 
 需要 Windows、已登录且正在运行的 Codex 桌面端，以及含 Tk 的 Python 3.10+。l2m_serinorin图片皮肤另需 Pillow。可以让 Codex 检查并协助准备环境。
